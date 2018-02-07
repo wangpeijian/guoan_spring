@@ -4,6 +4,10 @@
 
 import { config } from '../config';
 
+import ResourceLoading from '../components/ResourceLoading'
+import Barrage from '../components/Barrage'
+import TextCarousel from '../components/TextCarousel'
+
 //保存所有的广播事件
 window.EVENT_STORAGE = window.EVENT_STORAGE === undefined ? {} : window.EVENT_STORAGE;
 
@@ -45,10 +49,26 @@ export default class {
     }
 
     installExtendsFunction() {
+
+        {
+            (function(doc, win) {
+                var docEl = doc.documentElement,
+                    resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+                    recalc = function() {
+                        var clientWidth = docEl.clientWidth;
+                        if (!clientWidth) return;
+                        docEl.style.fontSize = 625 * (clientWidth / 750) + '%';
+                    };
+                if (!doc.addEventListener) return;
+                win.addEventListener(resizeEvt, recalc, false);
+                doc.addEventListener('DOMContentLoaded', recalc, false);
+            })(document, window);
+        }
+
         /**
          * 扩展时间对象，增加Format方法
          */
-        (function() {
+        {
             /*对Date的扩展，将 Date 转化为指定格式的String
              月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
              年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
@@ -71,11 +91,14 @@ export default class {
                     if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
                 return fmt;
             }
-        }())
+        }
     }
 
     /*------------------添加vue组件------------------*/
     installComponent(Vue) {
+        Vue.component("ResourceLoading", ResourceLoading);
+        Vue.component("Barrage", Barrage);
+        Vue.component("TextCarousel", TextCarousel);
     }
 
     /*------------------添加vue过滤器------------------*/
