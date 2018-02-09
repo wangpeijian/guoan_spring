@@ -163,7 +163,7 @@
             run() {
                 const ctx = this.ctx;
                 const step = () => {
-                    ctx.clearRect(0, 0, 1000, 1000);
+                    ctx.clearRect(0, 0, width, height);
 
                     this.barrageArray.map(item => {
                         item.x -= barrageSpeed;
