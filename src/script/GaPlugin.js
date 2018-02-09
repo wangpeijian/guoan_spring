@@ -8,7 +8,6 @@ import ResourceLoading from '../components/ResourceLoading'
 import Barrage from '../components/Barrage'
 import TextCarousel from '../components/TextCarousel'
 import CreateImage from '../components/CreateImage'
-import Comment from '../components/Comment'
 
 //保存所有的广播事件
 window.EVENT_STORAGE = window.EVENT_STORAGE === undefined ? {} : window.EVENT_STORAGE;
@@ -102,7 +101,6 @@ export default class {
         Vue.component("Barrage", Barrage);
         Vue.component("TextCarousel", TextCarousel);
         Vue.component("CreateImage", CreateImage);
-        Vue.component("Comment", Comment);
     }
 
     /*------------------添加vue过滤器------------------*/
@@ -391,8 +389,20 @@ export default class {
             return arr.indexOf(`.${ext}`) !== -1;
         },
 
-        Vue.prototype.$isIphoneX = function () {
+        Vue.prototype.$isMaxScreen = function () {
             return screen.height/screen.width >= 2 ///iphone/gi.test(navigator.userAgent) && (screen.height === 812 && screen.width === 375);
+        }
+
+        Vue.prototype.$needSmoothTouch = function(){
+            if(!/iphone/gi.test(navigator.userAgent)){
+                return true;
+            }
+
+            if(!(screen.height === 812 && screen.width === 375)){
+                return true;
+            }
+
+            return false;
         }
     }
 }

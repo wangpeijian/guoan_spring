@@ -3,22 +3,20 @@
     .block {
         width: 100%;
         height: 0;
-        padding-bottom: 75%;
+        padding-bottom: 55%;
         margin: 0 auto;
         position: relative;
         background-position: center;
-        background-size: cover;
+        background-size: contain;
 
         .barrage {
             position: absolute;
             top: 0;
-            left: 0;
-            width: 100%;
+            left: 8%;
+            width: 84%;
             height: 100%;
         }
-
     }
-
 </style>
 
 <template>
@@ -26,15 +24,11 @@
         <div class="block" :style="{backgroundImage: `url(${barrageBG})`}">
             <canvas class="barrage" :width="width" :height="height" id="barrageCanvas"></canvas>
         </div>
-
-        <input class="barrage-input" type="text" v-model="addText">
-        <button class="submit" @click="submit" :disabled="!addText">提交一次</button>
-
     </section>
 </template>
 
 <script>
-    import barrageBG from '../../static/img/barrageBG.jpg';
+    const barrageBG = 'http://img.guoanfamily.com/spring/pages/page_15.jpg';
 
     const width = 400;
     const height = 300;
@@ -44,18 +38,33 @@
     const barrageColor = ["#65ff59", "#ff7a70", "#2476ff", "#ff52d0", "#ffd96b", "#5ee4ff", "#e92d36"];
 
     export default {
+        props: {
+            barrageList: {
+                type: Array,
+                default: ()=>{
+                    return [];
+                },
+            },
+
+            comment: {
+                type: Object,
+                default: ()=>{
+                    return {};
+                },
+            }
+        },
+
         data() {
             return {
                 barrageBG: barrageBG,
                 width: width,
                 height: height,
 
-                barrageArray: [],
                 ctx: null,
 
                 track: [],
                 lastTrack: 0,
-                addText: "",
+                barrageArray: [],
             }
         },
 
@@ -65,7 +74,7 @@
 
         mounted() {
             this.createTrack();
-            this.getData();
+            // this.getData();
             this.init();
             this.run();
         },
@@ -79,27 +88,6 @@
                     track.push(begin += portraitSize);
                 }
                 this.track = track;
-            },
-
-            getData() {
-                const textArray = [{
-                    text: "哈哈1111111111",
-                    portrait: "../../static/img/head.png"
-                },{
-                    text: "hello",
-                    portrait: "../../static/img/head.png"
-                },{
-                    text: "我爱陈乔恩",
-                    portrait: "../../static/img/head.png"
-                },{
-                    text: "啦啦啦",
-                    portrait: "../../static/img/head.png"
-                }];
-                textArray.map(item => {
-                    this._getRandomPosition(item, res => {
-                        this.barrageArray.push(res);
-                    });
-                });
             },
 
             /**
@@ -208,7 +196,7 @@
                 window.requestAnimationFrame(step);
             },
 
-            _pushText(text) {
+         /*   _pushText(text) {
                 this._getRandomPosition({text}, res => {
                     this.barrageArray.push(res);
                 });
@@ -219,10 +207,28 @@
                 const text = this.addText;
                 this.addText = "";
                 this._pushText(text);
-            }
+            }*/
         },
 
-        watch: {},
+        watch: {
+            barrageList(){
+                let array = [];
+                array = this.barrageList.map(item => {
+                    this._getRandomPosition(item, res => {
+                        this.barrageArray.push(res);
+                    })
+                });
+            },
+
+            //新增一条评论
+            comment(){
+                if(this.comment != null){
+                    this._getRandomPosition(Object.assign({}, this.comment), res => {
+                        this.barrageArray.push(res);
+                    })
+                }
+            }
+        },
 
         components: {}
     }

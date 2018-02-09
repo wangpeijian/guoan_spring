@@ -30,7 +30,8 @@
                     "http://img.guoanfamily.com/spring/pages/page_14.jpg",
                     "http://img.guoanfamily.com/spring/pages/page_15.jpg",
                     "http://img.guoanfamily.com/spring/pages/page_16.jpg",
-                    this.$isIphoneX() ?
+                    "http://img.guoanfamily.com/spring/pages/page_17.jpg",
+                    this.$isMaxScreen() ?
                         'http://img.guoanfamily.com/spring/pages/image-bg-max.png'
                         : 'http://img.guoanfamily.com/spring/pages/image-bg.png'
                 ],
@@ -40,11 +41,12 @@
 
         created() {
             if(window.location.href.includes("act.guoanfamily.com")){
-
-                if(!this.getStorage("openid")){
+                if(!sessionStorage.getItem("openid") || !sessionStorage.getItem("nickname") || !sessionStorage.getItem("headimgurl")){
                     let openid = this.getQueryString("openid");
                     if (openid) {
                         this.setStorage("openid", openid);
+                        this.setStorage("nickname", this.getQueryString("nickname"));
+                        this.setStorage("headimgurl", this.getQueryString("headimgurl"));
                     } else {
                         //跳转到微信授权链接
                         window.location.href = `http://act.guoanfamily.com/openweixin/user/getCode?redirect_url=${window.location.href}&scope=snsapi_base`;

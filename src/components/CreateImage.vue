@@ -11,24 +11,22 @@
             width: 100%;
         }
 
-        /*.upload{
-            position: fixed;
-            bottom: 100px;
-            width: 80%;
-            left: 10%;
-            height: 40px;
-        }*/
-
         .save{
             position: fixed;
             bottom: 200px;
             width: 80%;
             left: 10%;
             height: 40px;
+            z-index: 3;
         }
 
         .palette {
             width: 100%;
+            position: absolute;
+
+            &.palette-box{
+                z-index: 2;
+            }
         }
     }
 </style>
@@ -38,9 +36,9 @@
         <img class="picture" :src="imageUrl" alt="" id="picture" v-if="saved">
 
         <div v-show="!saved">
-            <!--<canvas class="palette" id="paletteBox" :height="wHeight" :width="wWidth"></canvas>-->
             <canvas class="palette" id="palette" :height="wHeight" :width="wWidth"></canvas>
-            <button class="save" @click="saved = true">确定</button>
+            <canvas class="palette palette-box" id="paletteBox" :height="wHeight" :width="wWidth"></canvas>
+            <button class="save" @click="saveImage">确定</button>
         </div>
     </div>
 
@@ -58,14 +56,12 @@
 
         data() {
             return {
-                // wWidth: 357,
-                // wHeight: 575,
                 wWidth: 0,
                 wHeight: 0,
                 ctx: null,
+                ctxBox: null,
 
                 imageUrl: "",
-
                 lastPoint: null,
 
                 headPosition: {
@@ -86,7 +82,7 @@
         },
 
         mounted() {
-            if (this.$isIphoneX()) {
+            if (this.$isMaxScreen()) {
                 this.wWidth = 720;
                 this.wHeight = 1280;
 
@@ -108,12 +104,17 @@
                 };
             }
 
-
             this.init(window.sessionStorage.getItem("IMAGE"));
         },
 
         methods: {
             async init(Pme) {
+                const canvasBox = document.getElementById('paletteBox');
+                const ctxBox = canvasBox.getContext('2d');
+                this.ctxBox = ctxBox;
+                ctxBox.imageSmoothingQuality = "high";
+                ctxBox.imageSmoothingEnabled = true;
+
                 const canvas = document.getElementById('palette');
                 const ctx = canvas.getContext('2d');
                 this.ctx = ctx;
@@ -121,7 +122,7 @@
                 ctx.imageSmoothingEnabled = true;
 
                 const me = await this.loadImage(Pme);
-                const bg = await this.loadImage(this.$isIphoneX() ? PbgMax : Pbg);
+                const bg = await this.loadImage(this.$isMaxScreen() ? PbgMax : Pbg);
                 this.me = me;
                 this.bg = bg;
 
@@ -133,10 +134,10 @@
                 ctx.drawImage(me, 0, 0, me.width, me.height, x, y, w, h);
                 this.headPosition = {x,y,w,h};
 
-                ctx.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, this.wWidth, this.wHeight);
+                ctxBox.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, this.wWidth, this.wHeight);
 
-                this.imageUrl = canvas.toDataURL('image/jpeg');
-                this.touchControl(canvas, ctx);
+                // this.imageUrl = canvas.toDataURL('image/jpeg');
+                this.touchControl(canvasBox);
             },
 
             loadImage(url) {
@@ -149,7 +150,7 @@
                 });
             },
 
-            touchControl(canvas, ctx) {
+            touchControl(canvas) {
                 canvas.addEventListener("touchstart", (e) => {
                     this.lastPoint = null;
                 }, false);
@@ -169,11 +170,19 @@
                         if (this.lastPoint) {
                             ctx.clearRect(0, 0, this.wWidth, this.wHeight);
                             const {px, py} = this.lastPoint;
+                            let moveX = (clientX - px);
+                            let moveY = (clientY - py);
+
+                            if(this.$needSmoothTouch()){
+                                moveX = moveX * 2;
+                                moveY = moveY * 2;
+                            }
+
                             //计算位移
-                            ctx.drawImage(me, 0, 0, me.width, me.height, x + (clientX - px), y + (clientY - py), w, h);
+                            ctx.drawImage(me, 0, 0, me.width, me.height, x + moveX, y + moveY, w, h);
                             this.headPosition = {
-                                x: x + (clientX - px),
-                                y: y + (clientY - py),
+                                x: x + moveX,
+                                y: y + moveY,
                                 w,
                                 h
                             }
@@ -211,8 +220,8 @@
                         this.lastPoint = {px1: clientX1, py1: clientY1, px2: clientX2, py2: clientY2};
                     }
 
-                    ctx.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, this.wWidth, this.wHeight);
-                    this.imageUrl = canvas.toDataURL('image/jpeg');
+                    // ctx.drawImage(bg, 0, 0, bg.width, bg.height, 0, 0, this.wWidth, this.wHeight);
+                    // this.imageUrl = canvas.toDataURL('image/jpeg');
                 }, false);
 
                 canvas.addEventListener("touchend", (e) => {
@@ -222,6 +231,12 @@
 
             //等比缩放图片
             scaleImage(xScale, yScale, {x, y, w, h}) {
+
+                if(this.$needSmoothTouch()){
+                    xScale = xScale * 2;
+                    yScale = yScale * 2;
+                }
+
                 if (xScale) {
                     //横向缩放 计算新的高度
                     h = (w + xScale) / w * h;
@@ -234,6 +249,19 @@
 
                 return {x, y, w, h};
             },
+
+            saveImage(){
+                //将两个图层的画面画到一个图层中并生成最终的图片
+                const canvas = document.createElement("canvas");
+                const ctxPic = canvas.getContext("2d");
+                canvas.width = this.wWidth;
+                canvas.height = this.wHeight;
+
+                ctxPic.drawImage(document.getElementById('palette'),  0, 0, this.wWidth, this.wHeight, 0, 0, this.wWidth, this.wHeight);
+                ctxPic.drawImage(document.getElementById('paletteBox'), 0, 0, this.wWidth, this.wHeight, 0, 0, this.wWidth, this.wHeight);
+                this.imageUrl = canvas.toDataURL('image/jpeg');
+                this.saved = true;
+            }
         },
 
         components: {}
