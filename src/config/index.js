@@ -13,11 +13,11 @@ let def = {
 };
 
 let dev = {
-    INTERFACE: "http://172.16.43.24:8021/newyear/",
+    INTERFACE: "https://www.guoanfamily.com/anniversary/",
 };
 
 let prod = {
-    INTERFACE: "https://www.guoanfamily.com/newyear/",
+    INTERFACE: "https://www.guoanfamily.com/anniversary/",
 };
 
 let config = isDev() ? dev : prod;

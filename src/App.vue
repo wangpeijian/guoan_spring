@@ -4,8 +4,10 @@
 
 <template>
     <div id="app">
-        <ResourceLoading :res="res" @complete="complete" v-show="!loadComplete"/>
-        <router-view v-show="loadComplete"></router-view>
+        <div v-if="!needAuth">
+            <ResourceLoading :res="res" @complete="complete" v-show="!loadComplete"/>
+            <router-view v-show="loadComplete"></router-view>
+        </div>
     </div>
 </template>
 
@@ -36,12 +38,13 @@
                         : 'http://img.guoanfamily.com/spring/pages/image-bg.png'
                 ],
                 loadComplete: false,
+                needAuth: true,
             }
         },
 
         created() {
-            if(window.location.href.includes("act.guoanfamily.com")){
-                if(!sessionStorage.getItem("openid") || !sessionStorage.getItem("nickname") || !sessionStorage.getItem("headimgurl")){
+              if(window.location.href.includes("www.guoanfamily.com")){
+                if(!localStorage.getItem("openid") || !localStorage.getItem("nickname") || !localStorage.getItem("headimgurl")){
                     let openid = this.getQueryString("openid");
                     if (openid) {
                         this.setStorage("openid", openid);
@@ -50,17 +53,19 @@
                     } else {
                         //跳转到微信授权链接
                         window.location.href = `http://act.guoanfamily.com/openweixin/user/getCode?redirect_url=${window.location.href}&scope=snsapi_base`;
+                        return;
                     }
                 }
-            }
+
+                setTimeout(() => {
+                    window.location.href = "https://www.guoanfamily.com/staticWeb/spring/#/"
+                }, 10);
+              }
+
+            this.needAuth = false;
         },
 
         mounted() {
-            if(location.href.includes("&isappinstalled")){
-                window.location.href = "http://act.guoanfamily.com/staticWeb/spring/"
-            }
-            this.$router.replace("/");
-
             if(this.getSession("IMAGE")){
                 this.setSession("IMAGE");
                 this.loadComplete = true
@@ -69,8 +74,12 @@
 
         methods: {
             getQueryString(name) {
+                if(!window.location.href.includes("?")){
+                    return null;
+                }
+
                 let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-                let r = window.location.search.substr(1).match(reg);
+                let r = window.location.href.split("?")[1].match(reg);
                 if (r != null) return decodeURIComponent(r[2]);
                 return null;
             },

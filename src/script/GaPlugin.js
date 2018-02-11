@@ -6,7 +6,6 @@ import { config } from '../config';
 
 import ResourceLoading from '../components/ResourceLoading'
 import Barrage from '../components/Barrage'
-import TextCarousel from '../components/TextCarousel'
 import CreateImage from '../components/CreateImage'
 
 //保存所有的广播事件
@@ -99,7 +98,6 @@ export default class {
     installComponent(Vue) {
         Vue.component("ResourceLoading", ResourceLoading);
         Vue.component("Barrage", Barrage);
-        Vue.component("TextCarousel", TextCarousel);
         Vue.component("CreateImage", CreateImage);
     }
 

@@ -9,19 +9,87 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        background: #ffffff;
 
         .box {
-            width: 30%;
-            height: 0;
-            padding-bottom: 30%;
+            width: 150px;
+            height: 50px;
             position: relative;
 
-            .loading {
+           .loading-icon{
+               background: url("../../static/img/loading-icon.png") center no-repeat;
+               background-size: contain;
+               width: 75px;
+               height: 57px;
+               display: inline-block;
+               position: absolute;
+               top: -45px;
+               right: 20px;
+               z-index: 2;
+               animation: icon-move 2s ease-in-out infinite;
+
+               @keyframes icon-move {
+                   0%{
+                       transform: translate(5px, 0);
+                   }
+
+                   25%{
+                       transform: translate(0, 5px);
+                   }
+
+                   50%{
+                       transform: translate(-5px, 0);
+                   }
+
+                   75%{
+                       transform: translate(0, -5px);
+                   }
+
+                   100%{
+                       transform: translate(5px, 0);
+                   }
+               }
+           }
+
+            .loading-bg{
+                background: url("../../static/img/loading-bg.png") center no-repeat;
+                background-size: contain;
+                width: 150px;
+                height: 50px;
+                display: inline-block;
                 position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
+                bottom: 0;
+
+                &::after{
+                    content: 'Loading';
+                    font-size: .25rem;
+                    background: #fff;
+                    position: absolute;
+                    bottom: 0;
+                    width: 100%;
+                    left: 0;
+                    color: #333;
+                    display: inline-block;
+                    text-align: center;
+                }
+
+                .progress-box{
+                    position: absolute;
+                    top: 8px;
+                    left: 24px;
+                    height: 20px;
+                    right: 24px;
+
+                    .progress{
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 0;
+                        height: 20px;
+                        background: rgb(222, 30, 43);
+                        transition: .3s;
+                    }
+                }
             }
         }
     }
@@ -30,13 +98,17 @@
 <template>
     <div class="mask">
         <div class="box">
-            <canvas class="loading" :height="size" :width="size" id="loadingCanvas"></canvas>
+            <span class="loading-icon"></span>
+            <div class="loading-bg">
+                <div class="progress-box">
+                    <div class="progress" :style="{width:  progress}" v-if="total !== 0"></div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
-    const stepLength = 0.01;
 
     export default {
         props: {
@@ -48,95 +120,26 @@
 
         data() {
             return {
-                size: 200,
-
                 ctx: null,
                 total: 0,
                 complete: 0,
 
-                targetPercent: 0,  // 0 - 1
-                nowPercent: 0,      // 0 - 1
+                progress: 0,
             }
         },
 
         created() {
-
+            this.total = this.res.length || 1;
         },
 
         mounted() {
-            this.total = this.res.length || 1;
             this.init();
-            this.run();
             this.imageLoad();
         },
 
         methods: {
             init() {
-                const canvas = document.getElementById('loadingCanvas');
-                const ctx = canvas.getContext('2d');
-                this.ctx = ctx;
-                ctx.imageSmoothingQuality = "high";
-                ctx.imageSmoothingEnabled = true;
 
-                this.drawRing();
-            },
-
-            drawRing(percent = 0) {
-                const size = this.size;
-                const ctx = this.ctx;
-                ctx.clearRect(0, 0, size, size);
-
-                ctx.beginPath();
-                ctx.strokeStyle = '#bababa';
-                ctx.lineWidth = 20;
-                ctx.arc(size / 2, size / 2, size / 2 - 20, 0, 2 * Math.PI);
-                ctx.stroke();
-
-                const lingrad = ctx.createLinearGradient(0, 0, 0, 150);
-                lingrad.addColorStop(0, '#1eb1eb');
-                lingrad.addColorStop(1, '#1eb1eb');
-
-                ctx.beginPath();
-                ctx.strokeStyle = lingrad;
-                ctx.lineWidth = 20;
-                ctx.lineCap = 'round';
-                ctx.arc(size / 2, size / 2, size / 2 - 20, -0.5 * Math.PI, (-0.5 * Math.PI) + percent * (2 * Math.PI));
-
-                ctx.shadowColor = "#97f9ff";
-                ctx.shadowBlur = 20;
-                ctx.stroke();
-
-                //百分比
-                ctx.font = "40px 黑体";
-                ctx.fillStyle = '#1eb1eb';
-                ctx.textBaseline = "middle";
-                const percentText = `${(percent * 100).toFixed(0)}%`;
-                const text = ctx.measureText(percentText);
-                ctx.fillText(percentText, (size  - text.width) / 2, size / 2 );
-            },
-
-            run() {
-                const step = () => {
-                    if (this.res.length === 0) {
-                        this.targetPercent = 1;
-                    } else {
-                        this.targetPercent = Number((this.complete / this.total).toFixed(2));
-                    }
-
-                    if (this.nowPercent >= 1) {
-                        this.$emit("complete");
-                        return;
-                    }
-
-                    if (this.nowPercent < this.targetPercent) {
-                        this.nowPercent += stepLength;
-                        this.drawRing(this.nowPercent);
-                    }
-
-                    window.requestAnimationFrame(step);
-                };
-
-                window.requestAnimationFrame(step);
             },
 
             imageLoad() {
@@ -144,6 +147,11 @@
                     let img = document.createElement("img");
                     img.onload = ()=>{
                         this.complete++;
+                        if (this.complete >= this.total) {
+                            setTimeout(() => {
+                                this.$emit("complete")
+                            }, 500);
+                        }
                     };
                     img.src = item;
                 });
@@ -151,7 +159,11 @@
             }
         },
 
-        watch: {},
+        watch: {
+            complete(){
+                this.progress = `${Number((this.complete / this.total).toFixed(2)) * 100}%`;
+            }
+        },
 
         components: {}
     }

@@ -19,6 +19,27 @@
                 height: 100%;
                 opacity: 0;
             }
+
+            .point-tip{
+                position: absolute;
+                bottom: .2rem;
+                width: .5rem;
+                height: .5rem;
+                background: url("../../static/img/point.png") no-repeat center;
+                background-size: contain;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                animation: point-move .5s infinite alternate;
+
+                @keyframes point-move {
+                    from {
+                        transform: translate(-50%, 0);
+                    }
+                    to{
+                        transform: translate(-50%, -50%);
+                    }
+                }
+            }
         }
 
         .comment-block{
@@ -51,7 +72,7 @@
                 padding: .1rem;
                 border-radius: .1rem;
                 border: 1px solid #ddd;
-                height: 2.5rem;
+                height: 1.5rem;
                 resize: none;
                 color: #333;
             }
@@ -65,6 +86,10 @@
                 font-size: .4rem;
                 color: #fff;
                 border-radius: .1rem;
+
+                &[disabled]{
+                    background: rgb(172, 172, 172);
+                }
             }
 
             .comment-list{
@@ -80,26 +105,41 @@
                         position: absolute;
                         left: 0;
                         top: 0;
+                        border-radius: 50%;
                     }
 
                     .comment-info{
                         padding: 0 0 0 .9rem;
 
-                        .praise{
+                        .praise-box{
                             position: absolute;
                             right: 0;
                             top: 0;
-                            display: inline-block;
-                            height: .3rem;
-                            width: .3rem;
-                            background: url("../../static/img/praise.png") no-repeat center;
-                            background-size: contain;
 
-                            &.active{
-                                background: url("../../static/img/praise-active.png") no-repeat center;
+                            .praise{
+                                display: inline-block;
+                                height: .3rem;
+                                width: .3rem;
+                                background: url("../../static/img/praise.png") no-repeat center;
                                 background-size: contain;
+                                vertical-align: middle;
+
+                                &.active{
+                                    background: url("../../static/img/praise-active.png") no-repeat center;
+                                    background-size: contain;
+                                }
+                            }
+
+                            .praise-num{
+                                line-height: .3rem;
+                                color: #326784;
+                                vertical-align: middle;
+                                display: inline-block;
+                                position: relative;
+                                top: .03rem;
                             }
                         }
+
 
                         .name{
                             color: #555;
@@ -137,6 +177,7 @@
             <div class="box">
                 <img class="page" :src="res[15]">
                 <input class="choose-image" type="file" id="file" @change="chooseImage">
+                <span class="point-tip"></span>
             </div>
 
             <img class="page" :src="res[16]" alt="">
@@ -150,10 +191,14 @@
                     <li class="item" v-for="(item, index) in commentList" :key="index">
                         <img class="header" :src="item.portrait" alt="" v-if="item.portrait">
                         <div class="comment-info">
-                            <span class="praise" :class="item.praised ? 'active' : ''" @click="praiseComment(index)" v-if="item.praised !== undefined"></span>
+                            <span class="praise-box" @click="praiseComment(index)" v-if="item.praised !== undefined">
+                                 <span class="praise" :class="item.praised ? 'active' : ''" ></span>
+                                <span class="praise-num">{{item.like}}</span>
+                            </span>
+
                             <p class="name">{{item.name}}</p>
                             <pre class="comment-text">{{item.text}}</pre>
-                            <p class="comment-time">1分钟前</p>
+                            <p class="comment-time">{{item.time}}</p>
                         </div>
                     </li>
                 </ul>
@@ -163,104 +208,7 @@
 </template>
 
 <script>
-    const stableComment = [
-        {
-            name: "刘鑫",
-            text: "智者见于未萌。5年来，公司全体同路人不忘初心，一路同行，确立了生态引领区域发展的“1+2+4+8”的新战略格局，以生态引领城市可持续发展的EOD模式为引领，布局生态城市、特色小镇、创新地产、城市运营四大业务群，努力打造“最具价值的生态城市综合运营商”。未来，我们将以无所畏惧、追求极致的态度，全新起航，开创生态文明建设的城市运营新风尚，续写引领人民美好生活的新篇章！",
-        },
-        {
-            name: "刘春",
-            text: "2018年是国安科技控股战略执行的开局之年，是展望新时代的一年，望公司全体同事在国安科技控股的坚强领导下，不忘初心、砥砺前行、同路同行、努力拼搏，在新的征程上取得更好的成绩。新的一年充满希望，我们每一个人要多一份责任、多一份坚守，感恩国安、感恩身边的每一位同仁，凝心聚力、共筑梦想，坚信国安科技控股的明天会更好。祝国安科技控股全体同事新年快乐！"
-        },
-        {
-            name: "江涛",
-            text: "我们辞别充满挑战、奋发有为的2017年，喜迎充满希望、开拓进取的2018年。值此辞旧迎新之际，我谨代表峨眉公司，向为公司发展做出贡献的全体员工致以最诚挚的问候和最衷心的祝福!"
-        },
-        {
-            name: "吴智雄",
-            text: "一个人走得快，一群人走得远，为了那远方的梦想，让我们携手，一路同行。"
-        },
-        {
-            name: "杨川",
-            text: "个人之力如星点，集体之火可燎原。2018年愿你我同心同向，同路同行！共创共享，砥砺奋进！不忘初心，在“中国领先的生态城市运营商”的大道上撸起袖子加油干！"
-        },
-        {
-            name: "杨小航",
-            text: "过去的一年，是艰苦创业、努力拼搏的一年。国安科技控股大家庭全体员工同心同行、共同奋进，取得了一定成绩。展望2018年，让我们不忘初心、牢记使命、聚力前行！"
-        },
-        {
-            name: "杜科",
-            text: "过去的一年，是艰苦创业的一年，是努力拼搏的一年，也是公司值得骄傲的一年。广大员工，沿着公司发展的方向，兢兢业业，努力拼搏，爱岗敬业，朝着共同的目标一同奋进，取得了巨大的成绩。“雄关漫漫真如铁，而今迈步从头越”面对2018年的机遇和挑战，我们将一如既往、信心倍增，激情满怀。"
-        },
-        {
-            name: "姜玉明",
-            text: "同路相伴，心系国安，永争第一，众志成城。辞旧迎新之际，让我们用激情点燃梦想，用努力铸就辉煌，用最饱满的热情迎接2018！"
-        },
-        {
-            name: "侯露",
-            text: "五载芳华，我们同心同向，戮力前行谱写华章。新征程，让我们不忘初心，追求卓越，携手共筑基业长青，最具价值的城市运营商，再创国安科技控股新辉煌！"
-        },
-        {
-            name: "张建军",
-            text: "新思想引领新征程， 2018，让我们共同携手，为生活更美好而奋斗！"
-        },
-        {
-            name: "殷程旭",
-            text: "天道酬勤，时不我待。新年的曙光，已照亮前路，让我们不蹉跎岁月，勿空谈妄语，携手奋进，只争朝夕启新程。"
-        },
-        {
-            name: "党艳梅",
-            text: "岁月不居，五载风雨战略重塑谱新篇；继往开来，厚积薄发城市发展焕新颜。以此献礼国安城市五周年生日。"
-        },
-        {
-            name: "范睿",
-            text: "伟大是坚持出来的！"
-        },
-        {
-            name: "王永峰",
-            text: "祝愿国安城市，能够作为满足客户尊重与自我实现的城市运营商，永远比时代提前一小步。"
-        },
-        {
-            name: "刘灯",
-            text: "不忘初心，砥砺前行！让我们携手，投身这样一个恢弘时代，开启国安城市新篇章！"
-        },
-        {
-            name: "杨永锋",
-            text: "2017年已悄然过去，2018年已经开启。站在新的历史起点上，机遇与挑战并存，希望与责任同在。让我们发扬国安永远争第一精神，为国安城市再创辉煌！"
-        },
-        {
-            name: "李珂",
-            text: "五年风雨兼程路；几载耕耘易春秋；一路同行的国安城市人；必将共同迎来广阔而美好的伟大前程！"
-        },
-        {
-            name: "张丽文",
-            text: "愿与公司共同携手，相扶相持，不离不弃，共同开创国安城市更加美好的未来！"
-        },
-        {
-            name: "赵钺",
-            text: "用真诚品味生活，用真情品味朋友，用真心品味工作。国安城市同路人，让我们不忘初心、砥砺前行、再创佳绩！"
-        },
-        {
-            name: "宋波",
-            text: "国安城市5年，一路走来我们同心同向，同路同行！新的一年，让我们不忘初心，在追求卓越的道路上砥砺前行。国安永远争第一！"
-        },
-        {
-            name: "崔幼玲",
-            text: "回顾2017艰辛而有为，展望2018行稳以致远。新征程已然出发，我们会以更加稳健自信的姿态，不忘初心砥砺前行！"
-        },
-        {
-            name: "陈凯",
-            text: "2018年我们会以更加稳健自信姿态，奋力有为，行稳致远！让我们携手并肩，在新的起点上砥砺奋进，共创国安城市美好明天！"
-        },
-        {
-            name: "冯启源",
-            text: "五年的艰苦奋斗，铸就了今天的辉煌成绩，这就是国安精神的最佳体现！国安城市公司的明天一定会更加美好！"
-        },
-    ].map(item =>{
-        item.praised = true;
-        item.portrait = "../../static/img/head.png";
-        return item;
-    });
+   import headImage from '../../static/img/head.png';
 
     export default {
         data() {
@@ -286,7 +234,7 @@
 
             return {
                 res: res,
-                commentList: stableComment,
+                commentList: [],
 
                 comment: "",
                 barrageList: [{
@@ -298,22 +246,48 @@
         },
 
         created() {
+            this.get("queryac").then(res => {
+                const likeList = localStorage.getItem("likeList") || "";
 
+                this.commentList = res.map(item => {
+                    if(!(item.portrait = item.Headurlimg)){
+                        item.portrait = headImage;
+                    }
+                    item.praised = likeList.includes(item.Id);
+                    item.text = item.Usercomment;
+                    item.time = new Date(item.Createtime).Format("yyyy-MM-dd hh:mm:ss");
+                    item.name = item.Nickname;
+                    item.like = item.Likenumber;
+                    return item;
+                });
+
+
+                this.barrageList = this.commentList.filter((item, index) => {
+                    return index > 22;
+                });
+            })
         },
 
         mounted() {
-            if(window.location.href.includes("act.guoanfamily.com")){
+            if(window.location.href.includes("www.guoanfamily.com")){
                 this.wxconfig();
             }
 
-           if(this.getSession("IMAGE")){
-               window.location.reload();
+           if(sessionStorage.getItem("IMAGE")){
+              sessionStorage.setItem("IMAGE", "");
+               // window.location.href = "https://www.guoanfamily.com/staticWeb/spring/#/";
            }
         },
 
         methods: {
             wxconfig() {
                 const URL = window.location.href;
+                const title = "国安城市5周年庆";
+                const desc = "逐梦新时代，同行新征程2018";
+                const link = "https://www.guoanfamily.com/staticWeb/spring/#/";
+                const imgUrl = "http://img.guoanfamily.com/spring/pages/page_01.jpgc";
+
+
                 this.post("jsapi/getJsapiSignature?local_url=" + URL,
                     {}, {
                         interfaceType: "weichat"
@@ -335,10 +309,10 @@
                     wx.ready(() => {
                         // 分享给朋友
                         wx.onMenuShareAppMessage({
-                            title: "迎元旦 贴窗花", //标题
-                            desc: "新年伊始是元旦，万象更新又一年，国安科技控股真诚答谢活动，欢迎您的参与。", //描述
-                            link: "http://act.guoanfamily.com/staticWeb/spring/#/",
-                            imgUrl: "https://img.guoanfamily.com/www/newyearShare.jpg", //图片
+                            title: title, //标题
+                            desc: desc, //描述
+                            link: link,
+                            imgUrl: imgUrl, //图片
                             trigger: (res) => {
                             },
                             success: (res) => {
@@ -351,10 +325,10 @@
                         });
                         // 分享到朋友圈
                         wx.onMenuShareTimeline({
-                            title: "迎元旦 贴窗花", //标题
-                            desc: "新年伊始是元旦，万象更新又一年，国安科技控股真诚答谢活动，欢迎您的参与。", //描述
-                            link: "http://act.guoanfamily.com/staticWeb/spring/#/",
-                            imgUrl: "https://img.guoanfamily.com/www/newyearShare.jpg", //图片
+                            title: title, //标题
+                            desc: desc, //描述
+                            link: link,
+                            imgUrl: imgUrl, //图片
                             trigger: (res) => {
                             },
                             success: (res) => {
@@ -377,7 +351,7 @@
                 const fs = new FileReader();
                 const file = e.target.files[0];
                 const fileName = file.name.toLowerCase();
-                if (!fileName.includes("png") && !fileName.includes("jpg")) {
+                if (!fileName.includes("png") && !fileName.includes("jpg") && !fileName.includes("jpeg")) {
                     alert("请选择图片");
                     return;
                 }
@@ -394,7 +368,7 @@
                     }
 
                     this.setSession("IMAGE", base64);
-                    this.$router.push(`/save`);
+                    this.$router.replace(`/save`);
                 }
 
                 fs.onload = load.bind(this);
@@ -538,26 +512,43 @@
             },
 
             praiseComment(i){
-                this.commentList[i].praised = !this.commentList[i].praised;
+                const likeList = localStorage.getItem('likeList') || "";
+                const item = this.commentList[i];
+                if(!likeList.includes(item.Id) && !item.praised){
+                    this.get(`updateal?id=${item.Id}`);
+                    item.praised = !item.praised;
+                    item.like++;
+
+                    localStorage.setItem('likeList', likeList + "," + item.Id);
+                }
             },
 
             submit(){
-                const openid = sessionStorage.getItem("openid");
-                const nickname = sessionStorage.getItem("nickname");
-                const headimgurl = sessionStorage.getItem("headimgurl");
+                const openid = localStorage.getItem("openid");
+                const nickname = localStorage.getItem("nickname");
+                const headimgurl = `${localStorage.getItem("headimgurl")}?imageView2/0/w/100/h/100`;
+                const comment = this.comment;
 
                 this.commentList.push({
                     name: nickname,
                     portrait: headimgurl,
-                    text: this.comment,
+                    text: comment,
+                    time: new Date().Format("yyyy-MM-dd hh:mm:ss")
                 });
 
                 this.commentData = {
                     portrait: headimgurl,
-                    text: this.comment,
+                    text: comment,
                 };
 
                 this.comment = "";
+
+                this.post('insertac', {
+                    "headurlimg": headimgurl,
+                    "nickname": nickname,
+                    "uid": openid,
+                    "usercomment": comment
+                })
             },
         },
         watch: {

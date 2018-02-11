@@ -35,7 +35,7 @@
     const barrageSpeed = 3;  //弹幕速度
     const density = 10;      //弹幕密度 （每屏平均n条）
     const portraitSize = 50;
-    const barrageColor = ["#65ff59", "#ff7a70", "#2476ff", "#ff52d0", "#ffd96b", "#5ee4ff", "#e92d36"];
+    const barrageColor = ["#65ff59", "#ff7a70", "#2476ff", "#ff52d0", "#fff2ea", "#5ee4ff", "#e92d36"];
 
     export default {
         props: {
@@ -132,6 +132,7 @@
                             // image: image,
                         }));
                     };
+                    image.crossOrigin = "Anonymous";
                     image.src = portrait;
                 } else {
                     cb(resObj)
