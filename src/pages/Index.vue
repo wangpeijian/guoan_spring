@@ -107,8 +107,8 @@
                     margin: 0 0 .5rem 0;
 
                     .header{
-                        width: .7rem;
-                        height: .7rem;
+                        width: .9rem;
+                        height: .9rem;
                         position: absolute;
                         left: 0;
                         top: 0;
@@ -116,17 +116,17 @@
                     }
 
                     .comment-info{
-                        padding: 0 0 0 .9rem;
+                        padding: 0 0 0 1.1rem;
 
                         .praise-box{
                             position: absolute;
                             right: 0;
-                            top: 0;
+                            top: -.05rem;
 
                             .praise{
                                 display: inline-block;
-                                height: .3rem;
-                                width: .3rem;
+                                height: .4rem;
+                                width: .4rem;
                                 background: url("../../static/img/praise.png") no-repeat center;
                                 background-size: contain;
                                 vertical-align: middle;
@@ -138,12 +138,12 @@
                             }
 
                             .praise-num{
-                                line-height: .3rem;
+                                font-size: .4rem;
+                                line-height: .4rem;
                                 color: #326784;
                                 vertical-align: middle;
                                 display: inline-block;
                                 position: relative;
-                                top: .03rem;
                             }
                         }
 
@@ -155,7 +155,7 @@
 
                         .comment-text{
                             padding-bottom: .15rem;
-                            white-space: normal;
+                            white-space: pre-line;
                             word-break: break-word;
                         }
 
@@ -223,7 +223,7 @@
 </template>
 
 <script>
-   import headImage from '../../static/img/head.png';
+   import headImage from '../../static/img/head.jpg';
 
     export default {
         data() {
