@@ -300,7 +300,7 @@
                 const title = "国安城市5周年庆";
                 const desc = "逐梦新时代，同行新征程2018";
                 const link = "https://www.guoanfamily.com/staticWeb/spring/#/";
-                const imgUrl = "http://img.guoanfamily.com/spring/pages/page_01.jpgc";
+                const imgUrl = "http://img.guoanfamily.com/spring/pages/page_01.jpg";
 
 
                 this.post("jsapi/getJsapiSignature?local_url=" + URL,
