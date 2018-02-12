@@ -33,6 +33,7 @@
                     "http://img.guoanfamily.com/spring/pages/page_15.jpg",
                     "http://img.guoanfamily.com/spring/pages/page_16.jpg",
                     "http://img.guoanfamily.com/spring/pages/page_17.jpg",
+                    "http://img.guoanfamily.com/spring/pages/page-gif.gif",
                     this.$isMaxScreen() ?
                         'http://img.guoanfamily.com/spring/pages/image-bg-max.png'
                         : 'http://img.guoanfamily.com/spring/pages/image-bg.png'

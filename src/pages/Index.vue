@@ -11,6 +11,13 @@
         .box{
             position: relative;
 
+            .gif{
+                position: absolute;
+                top: 13%;
+                width: 92.5%;
+                left: 3.75%;
+            }
+
             .choose-image{
                 position: absolute;
                 top: 0;
@@ -168,7 +175,15 @@
     <div>
         <div class="main">
 
-            <img class="page" v-for="(item, index) in res" :key="item" :src="item" alt="" v-if="index <= 13">
+            <img class="page" v-for="(item, index) in res" :key="item" :src="item" alt="" v-if="index <= 11">
+
+            <div class="box">
+                <img class="page" :src="res[12]" alt="">
+                <img class="gif" src="http://img.guoanfamily.com/spring/pages/page-gif.gif" alt="">
+            </div>
+
+
+            <img class="page" :src="res[13]" alt="">
 
             <Barrage :barrageList="barrageList" :comment="commentData" v-if="barrageList.length !== 0"/>
 
