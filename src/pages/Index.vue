@@ -13,9 +13,9 @@
 
             .gif{
                 position: absolute;
-                top: 13%;
-                width: 92.5%;
-                left: 3.75%;
+                top: 13.3%;
+                width: 92.1%;
+                left: 3.77%;
             }
 
             .choose-image{
