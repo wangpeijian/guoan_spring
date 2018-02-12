@@ -24,7 +24,7 @@
                display: inline-block;
                position: absolute;
                top: -45px;
-               right: 20px;
+               right: 36px;
                z-index: 2;
                animation: icon-move 2s ease-in-out infinite;
 
@@ -62,7 +62,7 @@
 
                 &::after{
                     content: 'Loading';
-                    font-size: .25rem;
+                    font-size: 16px;
                     background: #fff;
                     position: absolute;
                     bottom: 0;
@@ -149,7 +149,7 @@
                         this.complete++;
                         if (this.complete >= this.total) {
                             setTimeout(() => {
-                                this.$emit("complete")
+                                 this.$emit("complete")
                             }, 500);
                         }
                     };
