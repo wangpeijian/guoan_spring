@@ -267,7 +267,10 @@
                 this.commentList = res.map(item => {
                     if(!(item.portrait = item.Headurlimg)){
                         item.portrait = headImage;
+                    }else if(item.portrait.indexOf("http") !== 0){
+                        item.portrait += "https://img.guoanfamily.com/";
                     }
+
                     item.praised = likeList.includes(item.Id);
                     item.text = item.Usercomment;
                     item.time = new Date(item.Createtime).Format("yyyy-MM-dd hh:mm:ss");
@@ -300,8 +303,7 @@
                 const title = "国安城市5周年庆";
                 const desc = "逐梦新时代，同行新征程2018";
                 const link = "https://www.guoanfamily.com/staticWeb/spring/#/";
-                const imgUrl = "http://img.guoanfamily.com/spring/pages/page_01.jpgc";
-
+                const imgUrl = "http://img.guoanfamily.com/spring/pages/page_01.jpg";
 
                 this.post("jsapi/getJsapiSignature?local_url=" + URL,
                     {}, {
