@@ -96,7 +96,7 @@
             <canvas class="palette palette-box" id="paletteBox" :height="wHeight" :width="wWidth"></canvas>
 
             <div class="re-choose">
-                重选
+                选择图片
                 <input class="choose-image" type="file" id="file" @change="chooseImage">
             </div>
 

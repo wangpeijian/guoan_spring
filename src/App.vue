@@ -5,7 +5,7 @@
 <template>
     <div id="app">
         <div v-if="!needAuth">
-            <ResourceLoading :res="res" @complete="complete" v-show="!loadComplete"/>
+<!--            <ResourceLoading :res="res" @complete="complete" v-show="!loadComplete"/>-->
             <router-view v-show="loadComplete"></router-view>
         </div>
     </div>
@@ -39,31 +39,33 @@
                         : 'http://img.guoanfamily.com/spring/pages/image-bg.png'
                 ],
                 loadComplete: false,
-                needAuth: true,
+                needAuth: false,
             }
         },
 
         created() {
-              if(window.location.href.includes("www.guoanfamily.com")){
-                if(!localStorage.getItem("openid") || !localStorage.getItem("nickname") || !localStorage.getItem("headimgurl")){
-                    let openid = this.getQueryString("openid");
-                    if (openid) {
-                        this.setStorage("openid", openid);
-                        this.setStorage("nickname", this.getQueryString("nickname"));
-                        this.setStorage("headimgurl", this.getQueryString("headimgurl"));
-                    } else {
-                        //跳转到微信授权链接
-                        window.location.href = `http://act.guoanfamily.com/openweixin/user/getCode?redirect_url=${window.location.href}&scope=snsapi_base`;
-                        return;
-                    }
-                }
+            //   if(window.location.href.includes("www.guoanfamily.com")){
+            //     if(!localStorage.getItem("openid") || !localStorage.getItem("nickname") || !localStorage.getItem("headimgurl")){
+            //         let openid = this.getQueryString("openid");
+            //         if (openid) {
+            //             this.setStorage("openid", openid);
+            //             this.setStorage("nickname", this.getQueryString("nickname"));
+            //             this.setStorage("headimgurl", this.getQueryString("headimgurl"));
+            //         } else {
+            //             //跳转到微信授权链接
+            //             window.location.href = `http://act.guoanfamily.com/openweixin/user/getCode?redirect_url=${window.location.href}&scope=snsapi_base`;
+            //             return;
+            //         }
+            //     }
+            //
+            //     setTimeout(() => {
+            //         window.location.href = "https://www.guoanfamily.com/staticWeb/spring/#/"
+            //     }, 10);
+            //   }
+            //
+            // this.needAuth = false;
 
-                setTimeout(() => {
-                    window.location.href = "https://www.guoanfamily.com/staticWeb/spring/#/"
-                }, 10);
-              }
-
-            this.needAuth = false;
+            this.complete();
         },
 
         mounted() {

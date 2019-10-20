@@ -9,7 +9,7 @@ const save = resolve => require(['../pages/Save'], resolve);
 const routes = [{
     path: '/',
     meta: {},
-    component: Index
+    component: save // Index
 },{
     path: '/save',
     meta: {},

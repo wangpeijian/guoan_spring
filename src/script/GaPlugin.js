@@ -4,8 +4,8 @@
 
 import { config } from '../config';
 
-import ResourceLoading from '../components/ResourceLoading'
-import Barrage from '../components/Barrage'
+// import ResourceLoading from '../components/ResourceLoading'
+// import Barrage from '../components/Barrage'
 import CreateImage from '../components/CreateImage'
 
 //保存所有的广播事件
@@ -96,8 +96,8 @@ export default class {
 
     /*------------------添加vue组件------------------*/
     installComponent(Vue) {
-        Vue.component("ResourceLoading", ResourceLoading);
-        Vue.component("Barrage", Barrage);
+        // Vue.component("ResourceLoading", ResourceLoading);
+        // Vue.component("Barrage", Barrage);
         Vue.component("CreateImage", CreateImage);
     }
 
